@@ -2,11 +2,11 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240607.1611"
+#define zVERSION        "zf240607.1736"
 #define zHOST           "bblmter1"              // ATTENTION, tout en minuscule
-#define zDSLEEP         false                // true ou false
-#define TIME_TO_SLEEP   120                 // dSleep en secondes 
-int zDelay1Interval =   2000;              // Délais en mili secondes pour la boucle loop
+#define zDSLEEP         0                       // 0 ou 1 !
+#define TIME_TO_SLEEP   120                     // dSleep en secondes 
+int zDelay1Interval =   2000;                   // Délais en mili secondes pour la boucle loop
 
 /*
 Utilisation:
@@ -53,8 +53,11 @@ https://chat.mistral.ai/    pour toute la partie API REST et wifiAuto ᕗ
 
 
 // General
-const int ledPin = 8;             // the number of the LED pin
-const int buttonPin = 9;          // the number of the pushbutton pin
+const int ledPin = 8;               // the number of the LED pin
+const int buttonPin = 9;            // the number of the pushbutton pin
+
+const int pulsePin = 0;             // la pin pour le détecteur de proximité (interruption)
+int pulsesCounter = 0;              // compteur de pulses
 
 
 // Sonar Pulse
@@ -76,12 +79,39 @@ const int buttonPin = 9;          // the number of the pushbutton pin
 // Temperature sensor
 #include "zTemperature.h"
 
-#if zDSLEEP == true
+#if zDSLEEP == 1
   // Deep Sleep
   #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
   // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
   RTC_DATA_ATTR int bootCount = 0;
 #endif
+
+
+
+
+
+
+
+//variables to keep track of the timing of recent interrupts
+unsigned long pulseRebondMillis = 250;  
+unsigned long pulseNextMillis = 0; 
+
+
+void IRAM_ATTR pulseInterrupt() {
+  if (millis() > pulseNextMillis){
+    ++pulsesCounter;
+    pulseNextMillis = millis() + pulseRebondMillis;
+    USBSerial.print(pulsesCounter);
+    USBSerial.println(", Y'a une bulle !");
+  }
+}
+
+
+
+
+
+
+
 
 
 void setup() {
@@ -102,7 +132,7 @@ void setup() {
   delay(3000);                          //le temps de passer sur la Serial Monitor ;-)
   USBSerial.println("\n\n\n\n**************************************\nCa commence !"); USBSerial.println(zHOST ", " zVERSION);
 
-  #if zDSLEEP == true
+  #if zDSLEEP == 1
     //Increment boot number and print it every reboot
     ++bootCount;
     sensorValue4 = bootCount;
@@ -130,7 +160,7 @@ void setup() {
   zEnvoieTouteLaSauce();
   USBSerial.println("\nC'est envoyé !\n");
 
-  #if zDSLEEP == true
+  #if zDSLEEP == 1
     // Partie dsleep. On va dormir !
     USBSerial.println("Going to sleep now");
     delay(200);
@@ -139,7 +169,16 @@ void setup() {
     USBSerial.println("This will never be printed");
   #endif
 
+	pinMode(pulsePin, INPUT_PULLUP);
+	attachInterrupt(pulsePin, pulseInterrupt, FALLING);
 }
+
+
+
+
+
+
+
 
 void loop() {
   // Envoie toute la sauce !
@@ -154,18 +193,18 @@ void loop() {
 void zEnvoieTouteLaSauce(){
 
   // Lit les températures
-  readSensor();
+  // readSensor();
 
   // Envoie les mesures au MQTT
-  sendSensorMqtt();
+  // sendSensorMqtt();
 
   // Graphe sur l'Arduino IDE les courbes des mesures
-  USBSerial.print("sensor1:");
-  USBSerial.print(sensorValue1);
-  USBSerial.print(",tempInternal1:");
-  USBSerial.print(tempInternal1);
-  USBSerial.print(",tempInternal2:");
-  USBSerial.print(tempInternal2);
+  // USBSerial.print("sensor1:");
+  // USBSerial.print(sensorValue1);
+  // USBSerial.print(",tempInternal1:");
+  // USBSerial.print(tempInternal1);
+  // USBSerial.print(",tempInternal2:");
+  // USBSerial.print(tempInternal2);
 
   // USBSerial.print(",sensor2:");
   // USBSerial.print(sensorValue2);
@@ -175,7 +214,8 @@ void zEnvoieTouteLaSauce(){
   // USBSerial.print(sensorValue4);
   // USBSerial.print(",sensor5:");
   // USBSerial.print(sensorValue5);
-  USBSerial.println("");
+
+  // USBSerial.println("");
 }
 
 
