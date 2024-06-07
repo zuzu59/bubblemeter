@@ -2,10 +2,10 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240607.1736"
+#define zVERSION        "zf240607.1802"
 #define zHOST           "bblmter1"              // ATTENTION, tout en minuscule
 #define zDSLEEP         0                       // 0 ou 1 !
-#define TIME_TO_SLEEP   120                     // dSleep en secondes 
+#define zTIME_TO_SLEEP  120                     // dSleep en secondes 
 int zDelay1Interval =   2000;                   // Délais en mili secondes pour la boucle loop
 
 /*
@@ -57,7 +57,7 @@ const int ledPin = 8;               // the number of the LED pin
 const int buttonPin = 9;            // the number of the pushbutton pin
 
 const int pulsePin = 0;             // la pin pour le détecteur de proximité (interruption)
-int pulsesCounter = 0;              // compteur de pulses
+int zPulsesCounter = 0;              // compteur de pulses
 
 
 // Sonar Pulse
@@ -82,7 +82,7 @@ int pulsesCounter = 0;              // compteur de pulses
 #if zDSLEEP == 1
   // Deep Sleep
   #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
-  // #define TIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
+  // #define zTIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
   RTC_DATA_ATTR int bootCount = 0;
 #endif
 
@@ -93,15 +93,15 @@ int pulsesCounter = 0;              // compteur de pulses
 
 
 //variables to keep track of the timing of recent interrupts
-unsigned long pulseRebondMillis = 250;  
-unsigned long pulseNextMillis = 0; 
+unsigned long zPulseRebondMillis = 250;  
+unsigned long zPulseNextMillis = 0; 
 
 
-void IRAM_ATTR pulseInterrupt() {
-  if (millis() > pulseNextMillis){
-    ++pulsesCounter;
-    pulseNextMillis = millis() + pulseRebondMillis;
-    USBSerial.print(pulsesCounter);
+void IRAM_ATTR zPulseInterrupt() {
+  if (millis() > zPulseNextMillis){
+    ++zPulsesCounter;
+    zPulseNextMillis = millis() + zPulseRebondMillis;
+    USBSerial.print(zPulsesCounter);
     USBSerial.println(", Y'a une bulle !");
   }
 }
@@ -109,6 +109,21 @@ void IRAM_ATTR pulseInterrupt() {
 
 
 
+//variables to keep track of the timing of recent interrupts
+unsigned long zPulseIntegrationMillis = 30000;  
+unsigned long zPulseNextIntegrationMillis = 0; 
+unsigned long zPulseMinutes = 0; 
+
+
+void zPulseIntegration() {
+  if (millis() > zPulseNextIntegrationMillis){
+    zPulseNextIntegrationMillis = millis() + zPulseIntegrationMillis;
+    zPulseMinutes = zPulsesCounter * 60 * 1000 / zPulseIntegrationMillis;
+    USBSerial.print(zPulseMinutes);
+    USBSerial.println(" bulles par minutes !");
+    zPulsesCounter = 0;
+  }
+}
 
 
 
@@ -138,8 +153,8 @@ void setup() {
     sensorValue4 = bootCount;
     USBSerial.println("Boot number: " + String(bootCount));
     // Configuration du dsleep
-    esp_sleep_enable_timer_wakeup(TIME_TO_SLEEP * uS_TO_S_FACTOR);
-    USBSerial.println("Setup ESP32 to sleep for every " + String(TIME_TO_SLEEP) + " Seconds");
+    esp_sleep_enable_timer_wakeup(zTIME_TO_SLEEP * uS_TO_S_FACTOR);
+    USBSerial.println("Setup ESP32 to sleep for every " + String(zTIME_TO_SLEEP) + " Seconds");
   #endif
 
   // Start WIFI
@@ -170,14 +185,8 @@ void setup() {
   #endif
 
 	pinMode(pulsePin, INPUT_PULLUP);
-	attachInterrupt(pulsePin, pulseInterrupt, FALLING);
+	attachInterrupt(pulsePin, zPulseInterrupt, FALLING);
 }
-
-
-
-
-
-
 
 
 void loop() {
@@ -219,6 +228,10 @@ void zEnvoieTouteLaSauce(){
 }
 
 
+
+
+
+
 // Délais non bloquant pour le sonarpulse et l'OTA
 void zDelay1(long zDelayMili){
   long zDelay1NextMillis = zDelayMili + millis(); 
@@ -227,6 +240,8 @@ void zDelay1(long zDelayMili){
     server.handleClient();
     // Un petit coup sonar pulse sur la LED pour dire que tout fonctionne bien
     sonarPulse();
+    // Calcul le débit des bulles
+    zPulseIntegration();
   }
 }
 
