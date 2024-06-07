@@ -1,7 +1,7 @@
 //
 // OTA WEB server
 //
-// zf240514.1213
+// zf240528.1530
 //
 // Sources:
 // https://lastminuteengineers.com/esp32-ota-web-updater-arduino-ide/
@@ -15,13 +15,13 @@
 /*
  * Login page
  */
-#include "loginIndex.h"
+#include "otaLoginIndex.h"
 
 
 /*
  * Server Index Page
  */
-#include "serverIndex.h"
+#include "otaServerIndex.h"
 
 
 WebServer server(80);

@@ -1,5 +1,12 @@
 //zf240525.1038
 
+const int zSonarPulseOn = 50;    // délai pour sonarPulse
+const int zSonarPulseOff = 100;    // délai pour sonarPulse
+const int zSonarPulseWait = 500;    // délai pour sonarPulse
+byte zSonarPulseState = 1;    // état pour sonarPulse
+long zSonarPulseNextMillis = 0;    // état pour sonarPulse
+
+
 // Machine à état pour faire pulser deux fois la petite LED sans bloquer le système
 void sonarPulse(){
   if (zSonarPulseNextMillis < millis()){

@@ -1,4 +1,12 @@
-// zf240527.1440
+// zf240528.2350
+
+float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
+float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
+float sensorValue3 = 0;  // variable to store the value coming from the sensor 3
+float sensorValue4 = 0;  // variable to store the value coming from the sensor 4
+float sensorValue5 = 0;  // variable to store the value coming from the sensor 5
+#define TEMP_CELSIUS 0
+
 
 // MQTT
 #include <ArduinoHA.h>
