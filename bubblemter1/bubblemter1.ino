@@ -2,13 +2,13 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240608.1210"
+#define zVERSION        "zf240608.1412"
 #define zHOST           "bblmter1"              // ATTENTION, tout en minuscule
 #define zDSLEEP         0                       // 0 ou 1 !
 #define zTIME_TO_SLEEP  120                     // dSleep en secondes 
 int zDelay1Interval =   60000;                   // Délais en mili secondes pour la boucle loop
 
-// #define DEBUG true                              // A décommenter si on veut des prints console pour le debug
+#define DEBUG true                              // A décommenter si on veut des prints console pour le debug
 
 /*
 Utilisation:
@@ -83,11 +83,11 @@ int zPulsesCounter = 0;              // compteur de pulses
 // Temperature sensor
 #include "zTemperatureBubblemter1.h"
 
+RTC_DATA_ATTR int bootCount = 0;
 #if zDSLEEP == 1
   // Deep Sleep
   #define uS_TO_S_FACTOR 1000000  /* Conversion factor for micro seconds to seconds */
   // #define zTIME_TO_SLEEP  300      /* Time ESP32 will go to sleep (in seconds) */
-  RTC_DATA_ATTR int bootCount = 0;
 #endif
 
 
@@ -179,6 +179,9 @@ void loop() {
 
 // Envoie toute la sauce !
 void zEnvoieTouteLaSauce(){
+  // Juste pour voir s'il est toujours vivant sur home assistant ;-)
+  ++bootCount;
+  sensorValue4 = bootCount;
 
   // Calcul le débit des bulles
   sensorValue2 = zPulsesCounter * 60 * 1000 / zDelay1Interval;
