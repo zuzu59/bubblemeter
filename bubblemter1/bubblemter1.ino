@@ -2,7 +2,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240608.0948"
+#define zVERSION        "zf240608.1006"
 #define zHOST           "bblmter1"              // ATTENTION, tout en minuscule
 #define zDSLEEP         0                       // 0 ou 1 !
 #define zTIME_TO_SLEEP  120                     // dSleep en secondes 
@@ -191,7 +191,7 @@ void zEnvoieTouteLaSauce(){
   readSensor();
 
   // Envoie les mesures au MQTT
-  // sendSensorMqtt();
+  sendSensorMqtt();
 
   // Graphe sur l'Arduino IDE les courbes des mesures
   USBSerial.print("sensor1:");
