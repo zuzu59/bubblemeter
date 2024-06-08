@@ -45,6 +45,7 @@ https://lastminuteengineers.com/esp32-ota-web-updater-arduino-ide/
 https://github.com/dawidchyrzynski/arduino-home-assistant/blob/main/examples/sensor-integer/sensor-integer.ino
 https://chat.mistral.ai/    pour toute la partie API REST et wifiAuto ᕗ
 https://lastminuteengineers.com/handling-esp32-gpio-interrupts-tutorial/
+https://www.aliexpress.com/item/1005006579276114.html
 */
 
 
