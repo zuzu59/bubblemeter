@@ -1,4 +1,4 @@
-// zf240608.0923
+// zf240608.0959
 
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
 float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
@@ -68,6 +68,8 @@ void sendSensorMqtt(){
     Sensor2.setValue(sensorValue2);
     Sensor3.setValue(sensorValue3);
     Sensor4.setValue(sensorValue4);
-    Sensor5.setValue(sensorValue5);
+    if (sensorValue5 > -50){                // Test si le capteur DS18B20 est présent ?
+      Sensor5.setValue(sensorValue5);
+    }
 }
 
