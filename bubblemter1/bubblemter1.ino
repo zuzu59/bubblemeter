@@ -2,11 +2,13 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240607.1802"
+#define zVERSION        "zf240608.0948"
 #define zHOST           "bblmter1"              // ATTENTION, tout en minuscule
 #define zDSLEEP         0                       // 0 ou 1 !
 #define zTIME_TO_SLEEP  120                     // dSleep en secondes 
-int zDelay1Interval =   2000;                   // Délais en mili secondes pour la boucle loop
+int zDelay1Interval =   10000;                   // Délais en mili secondes pour la boucle loop
+
+// #define DEBUG true                              // A décommenter si on veut des prints console pour le debug
 
 /*
 Utilisation:
@@ -42,6 +44,7 @@ https://dronebotworkshop.com/wifimanager/
 https://lastminuteengineers.com/esp32-ota-web-updater-arduino-ide/
 https://github.com/dawidchyrzynski/arduino-home-assistant/blob/main/examples/sensor-integer/sensor-integer.ino
 https://chat.mistral.ai/    pour toute la partie API REST et wifiAuto ᕗ
+https://lastminuteengineers.com/handling-esp32-gpio-interrupts-tutorial/
 */
 
 
@@ -73,7 +76,7 @@ int zPulsesCounter = 0;              // compteur de pulses
 
 
 // MQTT
-#include "zMqtt.h"
+#include "zMqttBubblemter1.h"
 
 
 // Temperature sensor
@@ -87,46 +90,20 @@ int zPulsesCounter = 0;              // compteur de pulses
 #endif
 
 
-
-
-
-
-
-//variables to keep track of the timing of recent interrupts
+// Compteur de bulles
 unsigned long zPulseRebondMillis = 250;  
 unsigned long zPulseNextMillis = 0; 
-
 
 void IRAM_ATTR zPulseInterrupt() {
   if (millis() > zPulseNextMillis){
     ++zPulsesCounter;
     zPulseNextMillis = millis() + zPulseRebondMillis;
+#ifdef DEBUG
     USBSerial.print(zPulsesCounter);
     USBSerial.println(", Y'a une bulle !");
+#endif
   }
 }
-
-
-
-
-//variables to keep track of the timing of recent interrupts
-unsigned long zPulseIntegrationMillis = 30000;  
-unsigned long zPulseNextIntegrationMillis = 0; 
-unsigned long zPulseMinutes = 0; 
-
-
-void zPulseIntegration() {
-  if (millis() > zPulseNextIntegrationMillis){
-    zPulseNextIntegrationMillis = millis() + zPulseIntegrationMillis;
-    zPulseMinutes = zPulsesCounter * 60 * 1000 / zPulseIntegrationMillis;
-    USBSerial.print(zPulseMinutes);
-    USBSerial.println(" bulles par minutes !");
-    zPulsesCounter = 0;
-  }
-}
-
-
-
 
 
 void setup() {
@@ -171,11 +148,11 @@ void setup() {
   // go go go
   USBSerial.println("\nC'est parti !\n");
 
-  // Envoie toute la sauce !
-  zEnvoieTouteLaSauce();
-  USBSerial.println("\nC'est envoyé !\n");
-
   #if zDSLEEP == 1
+    // Envoie toute la sauce !
+    zEnvoieTouteLaSauce();
+    USBSerial.println("\nC'est envoyé !\n");
+
     // Partie dsleep. On va dormir !
     USBSerial.println("Going to sleep now");
     delay(200);
@@ -184,6 +161,7 @@ void setup() {
     USBSerial.println("This will never be printed");
   #endif
 
+  // Initialise le compteur de bulles
 	pinMode(pulsePin, INPUT_PULLUP);
 	attachInterrupt(pulsePin, zPulseInterrupt, FALLING);
 }
@@ -201,35 +179,33 @@ void loop() {
 // Envoie toute la sauce !
 void zEnvoieTouteLaSauce(){
 
+  // Calcul le débit des bulles
+  sensorValue2 = zPulsesCounter * 60 * 1000 / zDelay1Interval;
+#ifdef DEBUG
+  // USBSerial.print(sensorValue2);
+  // USBSerial.println(" bulles par minutes !");
+#endif
+  zPulsesCounter = 0;
+
   // Lit les températures
-  // readSensor();
+  readSensor();
 
   // Envoie les mesures au MQTT
   // sendSensorMqtt();
 
   // Graphe sur l'Arduino IDE les courbes des mesures
-  // USBSerial.print("sensor1:");
-  // USBSerial.print(sensorValue1);
-  // USBSerial.print(",tempInternal1:");
-  // USBSerial.print(tempInternal1);
-  // USBSerial.print(",tempInternal2:");
-  // USBSerial.print(tempInternal2);
-
-  // USBSerial.print(",sensor2:");
-  // USBSerial.print(sensorValue2);
-  // USBSerial.print(",sensor3:");
-  // USBSerial.print(sensorValue3);
-  // USBSerial.print(",sensor4:");
-  // USBSerial.print(sensorValue4);
-  // USBSerial.print(",sensor5:");
-  // USBSerial.print(sensorValue5);
-
-  // USBSerial.println("");
+  USBSerial.print("sensor1:");
+  USBSerial.print(sensorValue1);
+  USBSerial.print(",sensor2:");
+  USBSerial.print(sensorValue2);
+  USBSerial.print(",sensor3:");
+  USBSerial.print(sensorValue3);
+  USBSerial.print(",sensor4:");
+  USBSerial.print(sensorValue4);
+  USBSerial.print(",sensor5:");
+  USBSerial.print(sensorValue5);
+  USBSerial.println("");
 }
-
-
-
-
 
 
 // Délais non bloquant pour le sonarpulse et l'OTA
@@ -240,8 +216,6 @@ void zDelay1(long zDelayMili){
     server.handleClient();
     // Un petit coup sonar pulse sur la LED pour dire que tout fonctionne bien
     sonarPulse();
-    // Calcul le débit des bulles
-    zPulseIntegration();
   }
 }
 

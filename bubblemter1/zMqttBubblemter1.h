@@ -1,4 +1,4 @@
-// zf240528.2350
+// zf240608.0923
 
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
 float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
@@ -12,7 +12,7 @@ float sensorValue5 = 0;  // variable to store the value coming from the sensor 5
 #include <ArduinoHA.h>
 #define DEVICE_NAME      zHOST               // toujours en minuscules !
 #define SENSOR_NAME1     "Temp_Internal"
-#define SENSOR_NAME2     "Tilt"
+#define SENSOR_NAME2     "BubbleMeter"
 #define SENSOR_NAME3     "RSSI"
 #define SENSOR_NAME4     "BootCount"
 #define SENSOR_NAME5     "Temp_DS18B20"
@@ -41,9 +41,9 @@ static void ConnectMQTT() {
     Sensor1.setName(SENSOR_NAME1);           // c'est le nom du sensor sur Home Assistant !
     Sensor1.setUnitOfMeasurement("°C");
 
-    Sensor2.setIcon("mdi:angle-acute");
+    Sensor2.setIcon("mdi:gauge");
     Sensor2.setName(SENSOR_NAME2);           // c'est le nom du sensor sur Home Assistant !
-    Sensor2.setUnitOfMeasurement("°");
+    Sensor2.setUnitOfMeasurement("b/mn");
 
     Sensor3.setIcon("mdi:wifi-strength-1");
     Sensor3.setName(SENSOR_NAME3);           // c'est le nom du sensor sur Home Assistant !
