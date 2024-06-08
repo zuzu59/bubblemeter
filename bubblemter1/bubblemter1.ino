@@ -2,11 +2,11 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240608.1006"
+#define zVERSION        "zf240608.1210"
 #define zHOST           "bblmter1"              // ATTENTION, tout en minuscule
 #define zDSLEEP         0                       // 0 ou 1 !
 #define zTIME_TO_SLEEP  120                     // dSleep en secondes 
-int zDelay1Interval =   10000;                   // Délais en mili secondes pour la boucle loop
+int zDelay1Interval =   60000;                   // Délais en mili secondes pour la boucle loop
 
 // #define DEBUG true                              // A décommenter si on veut des prints console pour le debug
 
@@ -81,7 +81,7 @@ int zPulsesCounter = 0;              // compteur de pulses
 
 
 // Temperature sensor
-#include "zTemperature.h"
+#include "zTemperatureBubblemter1.h"
 
 #if zDSLEEP == 1
   // Deep Sleep
