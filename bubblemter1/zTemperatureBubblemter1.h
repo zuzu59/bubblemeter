@@ -1,4 +1,4 @@
-// zf240608.1200
+// zf240611.1035
 
 // ATTENTION, version special pour le Bubblemter1 !    (zf240608.1202)
 // car le DS18B20 est alimenté directement depuis les VCC et GND du esp32-c3
@@ -37,14 +37,14 @@ RTC_DATA_ATTR float tempInternal2 = 0;
 
 // Lit les senseurs
 void readSensor(){
-    // lit la température interne
-    sensorValue1 = temperatureRead();
-    sensorValue1 = sensorValue1 - 8.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
+    // // lit la température interne
+    // sensorValue1 = temperatureRead();
+    // sensorValue1 = sensorValue1 - 8.0;        // Enlève des ° en trop, je ne sais pas pourquoi ? zf240526.1142, zf240530.0908
 
-    // moyenne glissante
-    sensorValue1 = (sensorValue1 + tempInternal1 + tempInternal2) / 3;
-    tempInternal1 = tempInternal2;
-    tempInternal2 = sensorValue1;
+    // // moyenne glissante
+    // sensorValue1 = (sensorValue1 + tempInternal1 + tempInternal2) / 3;
+    // tempInternal1 = tempInternal2;
+    // tempInternal2 = sensorValue1;
 
     // lit la température du DS18B20
     sensors.requestTemperatures(); 

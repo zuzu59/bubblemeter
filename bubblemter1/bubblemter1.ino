@@ -2,7 +2,7 @@
 //
 // ATTENTION, ce code a été testé sur un esp32-c3. Pas testé sur les autres boards !
 //
-#define zVERSION        "zf240608.1412"
+#define zVERSION        "zf240611.1056"
 #define zHOST           "bblmter1"              // ATTENTION, tout en minuscule
 #define zDSLEEP         0                       // 0 ou 1 !
 #define zTIME_TO_SLEEP  120                     // dSleep en secondes 
@@ -164,7 +164,9 @@ void setup() {
 
   // Initialise le compteur de bulles
 	pinMode(pulsePin, INPUT_PULLUP);
-	attachInterrupt(pulsePin, zPulseInterrupt, FALLING);
+	// attachInterrupt(pulsePin, zPulseInterrupt, FALLING);
+	attachInterrupt(pulsePin, zPulseInterrupt, RISING);
+
 }
 
 
@@ -182,6 +184,9 @@ void zEnvoieTouteLaSauce(){
   // Juste pour voir s'il est toujours vivant sur home assistant ;-)
   ++bootCount;
   sensorValue4 = bootCount;
+
+  // Récupère l'état du compteur de bulles
+  sensorValue1 = zPulsesCounter;
 
   // Calcul le débit des bulles
   sensorValue2 = zPulsesCounter * 60 * 1000 / zDelay1Interval;

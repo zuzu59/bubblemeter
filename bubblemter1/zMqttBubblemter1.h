@@ -1,4 +1,4 @@
-// zf240608.0959
+// zf240611.1022
 
 float sensorValue1 = 0;  // variable to store the value coming from the sensor 1
 float sensorValue2 = 0;  // variable to store the value coming from the sensor 2
@@ -11,7 +11,7 @@ float sensorValue5 = 0;  // variable to store the value coming from the sensor 5
 // MQTT
 #include <ArduinoHA.h>
 #define DEVICE_NAME      zHOST               // toujours en minuscules !
-#define SENSOR_NAME1     "Temp_Internal"
+#define SENSOR_NAME1     "BubbleCounter"
 #define SENSOR_NAME2     "BubbleMeter"
 #define SENSOR_NAME3     "RSSI"
 #define SENSOR_NAME4     "BootCount"
@@ -24,7 +24,7 @@ HAMqtt mqtt(client, device);
 unsigned long lastUpdateAt = 0;
 
 // c'est le ID du sensor, il doit être unique !
-HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1, HASensorNumber::PrecisionP1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
+HASensorNumber Sensor1(DEVICE_NAME SENSOR_NAME1);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor2(DEVICE_NAME SENSOR_NAME2, HASensorNumber::PrecisionP2);   // c'est le nom du sensor sur MQTT ! (PrecisionP1=x.1, PrecisionP2=x.01, ...)
 HASensorNumber Sensor3(DEVICE_NAME SENSOR_NAME3);   // c'est le nom du sensor sur MQTT !
 HASensorNumber Sensor4(DEVICE_NAME SENSOR_NAME4);   // c'est le nom du sensor sur MQTT !
@@ -37,9 +37,9 @@ static void ConnectMQTT() {
     device.setManufacturer("espressif");
     device.setModel("esp32-c3 super mini");
 
-    Sensor1.setIcon("mdi:thermometer");
+    Sensor1.setIcon("mdi:gauge");
     Sensor1.setName(SENSOR_NAME1);           // c'est le nom du sensor sur Home Assistant !
-    Sensor1.setUnitOfMeasurement("°C");
+    Sensor1.setUnitOfMeasurement("bbl");
 
     Sensor2.setIcon("mdi:gauge");
     Sensor2.setName(SENSOR_NAME2);           // c'est le nom du sensor sur Home Assistant !
